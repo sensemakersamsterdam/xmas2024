@@ -2,64 +2,88 @@
 row_col.py
 """
 
-
-
-from . import EffectBase
+from effects import RAINBOW, EffectBase
 
 
 class RowCol(EffectBase):
     """
-    RowColl effect
-    Params:
-        None
+    RowCol effect class to display a row or column of color on the matrix.
+
+    Attributes:
+        help_purpose (str): Description of the effect's purpose.
+        help_json (str): JSON representation of the effect.
+        index (int): Current index in the RAINBOW color list.
+        is_row (bool): Flag to determine if the effect is applied to rows or columns.
+        current_row_col (int): Current row or column index.
     """
 
-    def __init__(self, matrix, msg):
-        super().__init__(matrix, msg)
+    help_purpose = "Display a row or column of color on the matrix."
+    help_json = '{ "effect": "rowcol" }'
 
-        self.index = 0
-        self.is_row = True
-        self.current_row_col = 0
+    def __init__(self, matrix, params):
+        super().__init__(matrix, params)
+        self._index = 0
+        self._is_row = True
+        self._current_row_col = 0
 
-    def help_text(self):
-        return "Help on RowCol"
+    def _incr_index(self):
+        """
+        Increment the index and reset if it exceeds the length of RAINBOW.
 
-    def incr_index(self):
-        self.index = self.index + 1
-        if self.index >= len(self.rainbow):
-            self.index = 0
+        Returns:
+            bool: True if the index was reset, False otherwise.
+        """
+        self._index = self._index + 1
+        if self._index >= len(RAINBOW):
+            self._index = 0
             return True
         return False
 
-    def incr_row_col(self):
-        self.current_row_col = self.current_row_col + 1
-        max_row_col = self.matrix.n_rows if self.is_row else self.matrix.n_cols
-        if self.current_row_col >= max_row_col:
-            self.current_row_col = 0
-            self.is_row = False if self.is_row else True
+    def _incr_row_col(self):
+        """
+        Increment the current row or column index and switch between rows and columns.
+
+        Returns:
+            bool: True if the row/column index was reset and switched, False otherwise.
+        """
+        self._current_row_col = self._current_row_col + 1
+        max_row_col = self._matrix.n_rows if self._is_row else self._matrix.n_cols
+        if self._current_row_col >= max_row_col:
+            self._current_row_col = 0
+            self._is_row = not self._is_row
             return True
         return False
 
     def advance(self):
-        if self.incr_row_col():
-            self.incr_index()
+        """
+        Advance to the next row or column and update the color index if needed.
+        """
+        if self._incr_row_col():
+            self._incr_index()
 
     def render(self):
-        self.matrix.clear()
-        if self.is_row:
-            self.matrix.line(
-                self.current_row_col,
+        """
+        Render the current row or column with the current color.
+        """
+        m = self._matrix
+        m.clear()
+        if self._is_row:
+            m.line(
+                self._current_row_col,
                 0,
-                self.current_row_col,
-                self.matrix.n_cols - 1,
-                color=EffectBase.rainbow[self.index],
+                self._current_row_col,
+                m.n_cols - 1,
+                color=RAINBOW[self._index],
             )
         else:
-            self.matrix.line(
-                self.matrix.n_rows - 1,
-                self.current_row_col,
+            m.line(
+                m.n_rows - 1,
+                self._current_row_col,
                 0,
-                self.current_row_col,
-                color=EffectBase.rainbow[self.index],
+                self._current_row_col,
+                color=RAINBOW[self._index],
             )
-        self.matrix.write()
+        m.write()
+
+
+register = (RowCol,)
