@@ -5,6 +5,7 @@ _loaded = False
 
 
 def load_settings(file_path=".env"):
+    global _loaded
     """
     Load settings from a file and store them in a global dictionary.
 

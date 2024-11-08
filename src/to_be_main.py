@@ -28,9 +28,9 @@ def startup():
     settings.load_settings()
 
     # Setup LED stuff
-    pix_pin = settings.get_setting("pix_pin", PIXEL_PIN)
-    pix_columns = settings.get_setting("pix_columns", COLS)
-    pix_rows = settings.get_setting("pix_rows", ROWS)
+    pix_pin = eval(settings.get_setting("pix_pin", PIXEL_PIN))
+    pix_columns = eval(settings.get_setting("pix_columns", COLS))
+    pix_rows = eval(settings.get_setting("pix_rows", ROWS))
     pixels = neopixel.NeoPixel(machine.Pin(pix_pin), pix_columns * pix_rows)
     matrix = pixellib.NeoPixMatrix(pixels, pix_columns, pix_rows)
     init_effects(matrix)
