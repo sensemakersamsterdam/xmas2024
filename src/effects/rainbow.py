@@ -15,7 +15,6 @@ class Rainbow(EffectBase):
         start_ms (int): Start time in milliseconds.
     """
     help_purpose = "Display a rainbow on the matrix."
-    help_json = '{ "effect": "rainbow" }'
 
     def __init__(self, matrix, params):
         """

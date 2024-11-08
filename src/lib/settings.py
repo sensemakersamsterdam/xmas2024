@@ -1,6 +1,7 @@
 # Module to read a simple settings file
 
 _settings = {}
+_loaded = False
 
 
 def load_settings(file_path=".env"):
@@ -18,6 +19,10 @@ def load_settings(file_path=".env"):
         Exception: If there is an error reading the settings file.
     """
     global _settings
+
+    if _loaded:
+        return
+
     print(f"Loading settings from {file_path}")
     try:
         with open(file_path) as f:
@@ -26,7 +31,8 @@ def load_settings(file_path=".env"):
                 # Ignore empty lines and comments
                 if line and not line.startswith("#"):
                     key, value = line.split("=")
-                    _settings[key.strip()] = value.strip()
+                    _settings[key.strip().lower()] = value.strip()
+        _loaded = True
     except Exception as e:
         print(f"Error reading settings file: {e}")
 
@@ -56,5 +62,21 @@ def get_settings(*args, file_path=".env"):
     Returns:
         tuple: A generator returning the values of the requested settings in order.
     """
-    d = get_settings_dict(file_path)
-    return (d.get(k, None) for k in args)
+    load_settings(file_path)
+    return (_settings.get(k.lower(), None) for k in args)
+
+
+def get_setting(key, default=None):
+    """
+    Retrieves a specific setting from the settings file.
+
+    Args:
+        key (str): The key of the setting to retrieve.
+        default: The default value to return if the setting is not found.
+
+    Returns:
+        str: The value of the setting if found, or the default value.
+    """
+    if not _loaded:
+        raise RuntimeError("Settings not loaded. Call load_settings() first.")
+    return _settings.get(key.lower(), default)

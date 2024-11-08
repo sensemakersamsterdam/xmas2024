@@ -45,7 +45,7 @@ def init_effects(matrix, use_async=False):
                 e += m.register
             else:
                 raise ImportError(f"Module {m} does not have a register attribute")
-    _effects = tuple(sorted(e, key=lambda x: x.__name__))
+    _effects = tuple(sorted(e, key=lambda x: x.__name__.lower()))
 
     if use_async:
         global _ASYNC
@@ -116,7 +116,7 @@ def effect_json(effect):
     if hasattr(effect, "help_json"):
         return effect.help_json
     else:
-        return f'{{ "effect": "{effect.__name__}" }}'
+        return f'{{ "effect": "{effect_name(effect)}" }}'
 
 
 def effect_by_name(effect_name):
@@ -131,7 +131,7 @@ def effect_by_name(effect_name):
     """
     effect_name = effect_name.lower()
     for e in _effects:
-        if e.__name__.lower() == effect_name:
+        if effect_name(e) == effect_name:
             return e
     return None
 
@@ -179,9 +179,6 @@ def start_effect(effect_name, params=None):
     if effect:
         if params is None:
             params = {}
-        if "effect" in params:
-            # Just give the params dict to the effect
-            del params["effect"]
         _current_effect = effect(_matrix, params)
         return _current_effect.start()
     return None

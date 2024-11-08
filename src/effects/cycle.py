@@ -11,7 +11,7 @@ class Cycle(EffectBase):
         color (tuple): Color to be displayed.
     """
     help_purpose = "Cycle through the matrix."
-    help_json = '{ "effect": "cycle", "color": "(200,0,0)" }'
+    help_json = '{ "effect": "cycle", "color": "(200,30,4)" }'
     
     def __init__(self, matrix, params):
         """
