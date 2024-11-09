@@ -1,5 +1,6 @@
 from . import EffectBase
 
+
 class Cycle(EffectBase):
     """
     Cycle effect class to cycle through the matrix.
@@ -10,9 +11,10 @@ class Cycle(EffectBase):
         index (int): Current index in the matrix.
         color (tuple): Color to be displayed.
     """
+
     help_purpose = "Cycle through the matrix."
     help_json = '{ "effect": "cycle", "color": "(200,30,4)" }'
-    
+
     def __init__(self, matrix, params):
         """
         Initialize the Cycle effect.
@@ -38,5 +40,6 @@ class Cycle(EffectBase):
         m = self._matrix
         m.clear(show=False)
         m.set_index(self._index % m.size(), self._color, show=True)
+
 
 register = (Cycle,)

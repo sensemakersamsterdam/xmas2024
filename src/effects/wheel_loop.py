@@ -1,5 +1,6 @@
 from effects import EffectBase, wheel
 
+
 class WheelLoop(EffectBase):
     """
     WheelLoop effect class to cycle through the matrix with a wheel effect.
@@ -9,8 +10,8 @@ class WheelLoop(EffectBase):
         help_json (str): JSON representation of the effect.
         index (int): Current index for the wheel effect.
     """
+
     help_purpose = "Cycle through the matrix with a wheel effect."
-    help_json = '{ "effect": "wheel_loop" }'
 
     def __init__(self, matrix, params):
         """
@@ -39,5 +40,6 @@ class WheelLoop(EffectBase):
             rc_index = (i * 256 // msize) + self._index
             m.set_index(i, wheel(rc_index & 255))
         m.write()
+
 
 register = (WheelLoop,)

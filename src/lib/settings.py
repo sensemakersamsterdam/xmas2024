@@ -1,10 +1,12 @@
 # Module to read a simple settings file
 
+DEFAULT_FILE = "dot.env"
+
 _settings = {}
 _loaded = False
 
 
-def load_settings(file_path=".env"):
+def load_settings(file_path=DEFAULT_FILE):
     """
     Load settings from a file and store them in a global dictionary.
 
@@ -18,7 +20,7 @@ def load_settings(file_path=".env"):
     Raises:
         Exception: If there is an error reading the settings file.
     """
-    global _settings
+    global _settings, _loaded
 
     if _loaded:
         return
@@ -37,7 +39,7 @@ def load_settings(file_path=".env"):
         print(f"Error reading settings file: {e}")
 
 
-def get_settings_dict(file_path=".env"):
+def get_settings_dict(file_path=DEFAULT_FILE):
     """
     Reads a settings file and returns a dictionary of settings.
 
@@ -51,7 +53,7 @@ def get_settings_dict(file_path=".env"):
     return _settings
 
 
-def get_settings(*args, file_path=".env"):
+def get_settings(*args, file_path=DEFAULT_FILE):
     """
     Retrieves specific settings from the settings file.
 

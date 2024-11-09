@@ -4,6 +4,7 @@ rainbow.py - Display a rainbow on the matrix
 
 from . import EffectBase, RAINBOW
 
+
 class Rainbow(EffectBase):
     """
     Rainbow effect class to display a rainbow on the matrix.
@@ -14,6 +15,7 @@ class Rainbow(EffectBase):
         rainbow (list): List of colors representing the rainbow.
         start_ms (int): Start time in milliseconds.
     """
+
     help_purpose = "Display a rainbow on the matrix."
 
     def __init__(self, matrix, params):
@@ -41,5 +43,6 @@ class Rainbow(EffectBase):
         for i in range(m.size()):
             m.set_index(i, self._rainbow[i])
         m.write()
+
 
 register = (Rainbow,)

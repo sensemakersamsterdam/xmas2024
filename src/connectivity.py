@@ -34,7 +34,6 @@ from binascii import hexlify
 
 
 def mqtt_message(topic, msg):
-    global effect
     try:
         topic = topic.decode()
         print(f"Start {topic=} -- {msg=}")

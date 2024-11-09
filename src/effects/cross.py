@@ -4,6 +4,7 @@ red_cross.py - Display a red cross on the matrix
 
 from . import EffectBase
 
+
 class Cross(EffectBase):
     """
     Cross effect class to display a red cross on the matrix.
@@ -15,6 +16,7 @@ class Cross(EffectBase):
         wait (int): Wait time in milliseconds between toggles.
         color (tuple): Color of the cross.
     """
+
     help_purpose = "Display a red cross on the matrix."
     help_json = '{ "effect": "cross", "color": "(200,0,0)", "wait": 500 }'
 
@@ -48,5 +50,6 @@ class Cross(EffectBase):
         Advance the cross effect by toggling the display state.
         """
         self._is_on = not self._is_on
+
 
 register = (Cross,)

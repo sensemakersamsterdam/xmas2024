@@ -1,6 +1,6 @@
 import time
 from effects import all_effect_names, effect_loop, random_color, start_effect
-from to_be_main import startup
+from app import startup
 
 def test_effects():
     """

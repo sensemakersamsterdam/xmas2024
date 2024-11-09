@@ -18,7 +18,6 @@ class RowCol(EffectBase):
     """
 
     help_purpose = "Display a row or column of color on the matrix."
-    help_json = '{ "effect": "rowcol" }'
 
     def __init__(self, matrix, params):
         super().__init__(matrix, params)

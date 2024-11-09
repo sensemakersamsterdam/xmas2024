@@ -5,9 +5,10 @@ effect_base.py:
     - Utility functions and constants.
 """
 
-from time import ticks_ms
+import json
 from os import listdir
 from random import choice
+from time import ticks_ms
 
 _ASYNC = False  # Use asyncio for effect loop if True
 _matrix = None  # holds the matrix object to render the effects on
@@ -54,7 +55,7 @@ def init_effects(matrix, use_async=False):
 
 def get_effects():
     """
-    Return a tuple of all registered effect objects, pre-sorted by name.
+    Return a tuple of all registered effect objects, sorted by effect name.
 
     Returns:
         tuple: A tuple containing all registered effect objects, sorted by their name.
@@ -62,17 +63,18 @@ def get_effects():
     return _effects
 
 
-def effect_name(e):
+def get_effect_name(effect):
     """
     Return the name of the effect passed in.
 
     Args:
-        e: The effect class to get the name of.
+        effect: The effect class to get the name of.
 
     Returns:
         str: The name of the effect in lowercase.
     """
-    return e.__name__.lower()
+    assert issubclass(effect, EffectBase), f"Not an effect {effect}"
+    return effect.__name__.lower()
 
 
 def all_effect_names():
@@ -82,10 +84,10 @@ def all_effect_names():
     Returns:
         tuple: A tuple containing the names of all registered effects in lowercase.
     """
-    return tuple(effect_name(e) for e in _effects)
+    return tuple(get_effect_name(e) for e in _effects)
 
 
-def effect_purpose(effect):
+def get_effect_purpose(effect):
     """
     Return the purpose of the effect as a string.
 
@@ -96,13 +98,14 @@ def effect_purpose(effect):
         str: The purpose of the effect. If the effect has a 'help_purpose' attribute, it returns that.
              Otherwise, it returns a default message indicating the effect's name.
     """
+    assert issubclass(effect, EffectBase), f"Not an effect {effect}"
     if hasattr(effect, "help_purpose"):
         return effect.help_purpose
     else:
-        return f"Display {effect.__name__} on the matrix."
+        return f"Display {get_effect_name(effect)} on the matrix."
 
 
-def effect_json(effect):
+def get_effect_json(effect):
     """
     Return the JSON string to use to start the effect.
 
@@ -113,10 +116,11 @@ def effect_json(effect):
         str: The JSON string representation of the effect. If the effect has a 'help_json' attribute,
              it returns that. Otherwise, it returns a default JSON string with the effect's name.
     """
+    assert issubclass(effect, EffectBase), f"Not an effect {effect}"
     if hasattr(effect, "help_json"):
         return effect.help_json
     else:
-        return f'{{ "effect": "{effect_name(effect)}" }}'
+        return f'{{ "effect": "{get_effect_name(effect)}" }}'
 
 
 def effect_by_name(effect_name):
@@ -129,9 +133,10 @@ def effect_by_name(effect_name):
     Returns:
         EffectBase: The effect class if found, otherwise None.
     """
+    assert isinstance(effect_name, str), "str with effect name expected"
     effect_name = effect_name.lower()
     for e in _effects:
-        if effect_name(e) == effect_name:
+        if get_effect_name(e) == effect_name:
             return e
     return None
 
@@ -162,7 +167,26 @@ if _ASYNC:
     asyncio.create_task(effect_loop_async())
 
 
-def start_effect(effect_name, params=None):
+def start_effect(effect, params=None):
+    """
+    Start an effect with optional effect-specific parameters.
+
+    Args:
+        effect (EffectBase): The class of the effect to start.
+        params (dict, optional): A dictionary of parameters specific to the effect. Defaults to None.
+                                 Unrecognised parameters are ignored.
+
+    Returns:
+        The result of the efect's start() method, or None if not found.
+    """
+    global _current_effect
+    if params is None:
+        params = {}
+    _current_effect = effect(_matrix, params)
+    return _current_effect.start()
+
+
+def start_effect_by_name(effect_name, params=None):
     """
     Start an effect by name with optional effect-specific parameters.
 
@@ -172,15 +196,32 @@ def start_effect(effect_name, params=None):
                                  Unrecognised parameters are ignored.
 
     Returns:
-        The result of the efect's start() method, or None if not found.
+        The result of the effect's start() method, or None if not found.
     """
-    global _current_effect
     effect = effect_by_name(effect_name)
-    if effect:
-        if params is None:
-            params = {}
-        _current_effect = effect(_matrix, params)
-        return _current_effect.start()
+    if effect is not None:
+        return start_effect(effect, params)
+    return None
+
+
+def start_effect_from_json(json_str):
+    """
+    Start an effect from a JSON string.
+
+    Args:
+        json_str (str): The JSON string to parse and start the effect from.
+
+    Returns:
+        The result of the effect's start() method, or None if not found.
+    """
+    try:
+        params = json.loads(json_str)
+        effect_name = params.get("effect")
+        if effect_name is not None:
+            return start_effect_by_name(effect_name, params)
+    except Exception as e:
+        message = f"Could not start: {json_str}, {e}"
+        print(message)
     return None
 
 
@@ -339,7 +380,7 @@ def full_help():
     """
     help_lines = [f"Available effects: {", ".join(all_effect_names())}.\n"]
     for e in get_effects():
-        name = effect_name(e)
-        help_lines.append(f"{name}: {effect_purpose(e)}")
-        help_lines.append(f"{'':{len(name)+1}} {effect_json(e)}")
+        name = get_effect_name(e)
+        help_lines.append(f"{name}: {get_effect_purpose(e)}")
+        help_lines.append(f"{'':{len(name)+1}} {get_effect_json(e)}")
     return "\n".join(help_lines)
