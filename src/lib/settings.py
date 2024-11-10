@@ -6,7 +6,7 @@ _settings = {}
 _loaded = False
 
 
-def load_settings(file_path=DEFAULT_FILE):
+def load_settings(file_path=".env"):
     """
     Load settings from a file and store them in a global dictionary.
 
