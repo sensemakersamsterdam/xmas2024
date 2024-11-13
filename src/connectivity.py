@@ -1,89 +1,91 @@
 import machine
-import neopixel
 import network
-import pixellib
 import settings
 from umqtt.robust import MQTTClient
+import time
 from binascii import hexlify
+
+_callbacks = {}
+_main_topic = "#"
+
+_client = None
+
+def register_callback(topic, callback):
+    topic.strip()
+    if callback is None:
+        if topic in _callbacks:
+            del _callbacks[topic]
+        return
+    _callbacks[topic] = callback
+
+
+def mqtt_message(topic, msg):
+    try:
+        topic = topic.strip().decode()
+        if topic.startswith(_main_topic):
+            topic = topic[len(_main_topic) :]
+
+        handler = _callbacks.get(topic, None)
+        if handler is not None:
+            try:
+                handler(msg)
+            except Exception as e:
+                print(f"Error in handler for {topic}: {e}")
+        else:
+            print(f"No handler for {topic}")
+    except Exception as e:
+        print("Unexpected error ignored: ", e)
+
+
+def connect_mqtt(clean_session=True):
+    global _main_topic, _client
+    
+    if _client is not None:
+        try:
+            _client.disconnect()
+        except Exception:
+            pass
+
     (
-        wifi_ssid,
-        wifi_passwd,
         mqtt_user,
         mqtt_pass,
         mqtt_client_id,
         mqtt_server,
         mqtt_user,
         mqtt_pass,
-        mtopic,
-        atopic,
+        _main_topic,
     ) = settings.get_settings(
-        "wifi_ssid",
-        "wifi_passwd",
         "mqtt_user",
         "mqtt_pass",
         "mqtt_client_id",
         "mqtt_server",
         "mqtt_user",
         "mqtt_pass",
-        "mtopic",
-        "atopic",
+        "main_topic",
     )
-  mqtt_client_id = hexlify(
+    mqtt_client_id = hexlify(
         mqtt_client_id.encode() if mqtt_client_id else machine.unique_id()
     )
+    if not _main_topic.endswith("/"):
+        _main_topic += "/"
 
-
-def mqtt_message(topic, msg):
-    try:
-        topic = topic.decode()
-        print(f"Start {topic=} -- {msg=}")
-        if msg is not None:
-            msg = msg.decode()
-            params = json.loads(msg)
-            topic = params.get("effect", topic)
-        else:
-            params = None
-        print(f"pa rams {params=}")
-
-        helpstr = params.get("help", None)
-        if helpstr is None:
-            effect = effects.get(topic, EffectBase)(matrix, params)
-        else:
-            effect.start()
-            print("get help on " + helpstr)
-            provider = effects.get(helpstr, None)
-            print(f"provider = '{provider}'")
-
-            if provider is None:
-                helptext = effects.help_text()
-            else:
-                helptext = provider.help_text()
-            print(f"help: {helptext=}")
-            client.publish(mtopic + "/help", helptext)
-    except Exception as e:
-        print("Error: ", e)
-
-
-def connect_mqtt():
-    global mtopic
-    global atopic
-    print("Connecting to MQTT---", end="")
-    client = MQTTClient(mqtt_client_id, mqtt_server, user=mqtt_user, password=mqtt_pass)
+    print("Connecting to MQTT...", end="")
+    _client = MQTTClient(mqtt_client_id, mqtt_server, user=mqtt_user, password=mqtt_pass, keepalive=60)
+    
     isconnected = False
-    while not isconnected:
+    while True:
         try:
-            client.connect()
-            isconnected = True
-        except:
-            print("-", end="")
+            _client.connect(clean_session=clean_session)
+            break
+        except Exception as e:
+            print(".", end="")
+            time.sleep(1)
 
-    client.set_callback(mqtt_message)
-    client.subscribe(mtopic)
-    client.subscribe(atopic)
-
+    _client.set_callback(mqtt_message)
+    _client.subscribe(_main_topic + "#")
     print("MQTT Connected")
 
-    return client
+    return _client
 
 
 print("Connecting to WiFi...", end="")
@@ -95,4 +97,4 @@ while not wifi.isconnected():
     sleep(0.25)
 print(f"Connected to WIFI {wifi.ifconfig()[0]}")
 
-client = connect_mqtt()
+_client = connect_mqtt()
