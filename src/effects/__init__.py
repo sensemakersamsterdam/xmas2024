@@ -370,7 +370,18 @@ def random_color(color_list=RAINBOW):
     """
     return choice(color_list)
 
-
+def fader(fade_index: int, fade_max : int, fade_from, fade_to):
+    if isinstance(fade_from, tuple) and isinstance(fade_to, tuple):
+        #print(f"fade tuples {fade_index}, {fade_max}, {fade_from}, {fade_to}")
+        return tuple([fader(fade_index, fade_max, fade_from[i], fade_to[i]) for i in range(min(len(fade_from), len(fade_to)))])
+    if isinstance(fade_from, list) and isinstance(fade_to, list):
+        #print(f"fade tuples {fade_index}, {fade_max}, {fade_from}, {fade_to}")
+        return [fader(fade_index, fade_max, fade_from[i], fade_to[i]) for i in range(min(len(fade_from), len(fade_to)))]  
+    else:
+        #print(f"fade floats {fade_index}, {fade_max}, {fade_from}, {fade_to}")
+        return round(((fade_from * (fade_max - fade_index)) + (fade_to * fade_index)) / fade_max)
+    
+                       
 def full_help():
     """
     Return a string with the help for all effects.
