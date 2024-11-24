@@ -1,5 +1,5 @@
 import time
-from effects import all_effect_names, effect_loop, random_color, start_effect
+from effects import all_effect_names, effect_loop, random_color, start_effect, effect_by_name
 from app import startup
 
 def test_effects():
@@ -16,7 +16,7 @@ def test_effects():
         if start_time + 10 < time.time():
             curr_effect = effect_names[0]
             effect_names = effect_names[1:] + [curr_effect]
-            start_effect(curr_effect, {"color": f"{random_color()}"})
+            start_effect(effect_by_name(curr_effect), {"color": f"{random_color()}"})
             print(f"Starting effect: {curr_effect}")
             start_time = time.time()
         effect_loop()
