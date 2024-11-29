@@ -6,7 +6,7 @@ plate_length = 60;
 tree_dist = 7;
 bold_dia=2.8;
 bold_dia_2 = 2.2;
-
+blind_klink_dia = 5;
 led_dia=4;
 led_size = [5, 5, 2];
 $fn=32;
@@ -137,7 +137,7 @@ module bottom()
 {
     difference()
     {
-        top_bottom();
+        top_bottom(blind_klink_dia);
         
         translate([-(tb_size[0]-17)/2, 0])
         square([3.1, 36.1], center=true);
@@ -165,7 +165,7 @@ module top()
 {
     difference()
     {
-        top_bottom();
+        top_bottom(bold_dia);
 
         for(y = led_center_y)
             translate([0, y])
@@ -184,7 +184,7 @@ module top1()
 {
     difference()
     {
-        top_bottom();
+        top_bottom(bold_dia);
 
         for(y = led_center_y)
             translate([0, y])
@@ -224,7 +224,7 @@ module top1()
 }
 
 
-module top_bottom()
+module top_bottom(mount_dia)
 {
     difference()
     {
@@ -235,7 +235,7 @@ module top_bottom()
             translate([-(tb_size[0] - rb_dia) / 2,  (tb_size[1] - rb_dia)/2]) circle(d=rb_dia);
             translate([-(tb_size[0] - rb_dia) / 2, -(tb_size[1] - rb_dia)/2]) circle(d=rb_dia);
         }
-        mount_holes();
+        mount_holes(mount_dia);
     }
 }
 
@@ -337,7 +337,7 @@ module printplate()
                     translate([x, y])
                         circle(d=6);
         }
-        mount_holes();
+        mount_holes(bold_dia);
         for(x = mount_center_x)
         for(y = led_center_y)
         {
@@ -377,17 +377,17 @@ module base_plate(is_mountplate=false)
                     translate([x, y])
                         circle(d=led_dia);
         }
-        mount_holes();
+        mount_holes(bold_dia);
     }
 }
 
 
-module mount_holes()
+module mount_holes(mount_dia)
 {
     // mount holes
     echo(bold_dist);
     for(x = mount_center_x)
         for(y = mount_center_y)
             translate([x, y])
-                circle(d=bold_dia);
+                circle(d=mount_dia);
 }
