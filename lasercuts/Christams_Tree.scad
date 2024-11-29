@@ -26,8 +26,8 @@ rb_dia = 5;
 
 // choose one of the following
 //mode = "3D";
-//mode = "2D";
- mode = "plate";
+mode = "2D";
+// mode = "plate";
 
 
 if (mode == "3D")
@@ -173,7 +173,7 @@ module top()
 
         mount_holes();
         
-        translate([0, 25])
+*        translate([0, 25])
             square([8, 12], center=true);
     }
 }
