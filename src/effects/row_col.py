@@ -1,5 +1,7 @@
 """
-row_col.py
+row_col.py - Display a row or column of color on the matrix.
+Author: Karijn Wessing, Sensemakers Amsterdam
+Maintainer: Sensemakers Amsterdam  https://sensemakersams.org
 """
 
 from effects import RAINBOW, EffectBase

@@ -1,4 +1,9 @@
-from . import EffectBase
+"""
+cycle.py - Cycle effect class to cycle through the matrix.
+Author: Karijn Wessing, Sensemakers Amsterdam
+Maintainer: Sensemakers Amsterdam  https://sensemakersams.org
+"""
+from . import EffectBase, text2color
 
 
 class Cycle(EffectBase):
@@ -25,7 +30,7 @@ class Cycle(EffectBase):
         """
         super().__init__(matrix, params)
         self._index = 0
-        self._color = eval(params.get("color", "(255, 0, 0)"))
+        self._color = text2color(params)
 
     def advance(self):
         """

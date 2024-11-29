@@ -1,3 +1,8 @@
+"""
+wheel_loop.py -  WheelLoop effect class.
+Author: Karijn Wessing, Sensemakers Amsterdam
+Maintainer: Sensemakers Amsterdam  https://sensemakersams.org
+"""
 from effects import EffectBase, wheel
 
 
@@ -19,7 +24,7 @@ class WheelLoop(EffectBase):
 
         Args:
             matrix: The matrix object to apply the effect on.
-            params: Additional parameters for the effect.
+            params (dict): Additional parameters for the effect.
         """
         super().__init__(matrix, params)
         self._index = 0
@@ -27,6 +32,9 @@ class WheelLoop(EffectBase):
     def advance(self):
         """
         Advance the wheel effect by incrementing the index.
+
+        Returns:
+            None
         """
         self._index += 1
 

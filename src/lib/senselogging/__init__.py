@@ -1,13 +1,15 @@
-import utime
+# Modified version of logging module from MicroPython.  Gijs Mos,  Sensemakers Amsterdam
 import sys
+
 import uio
+import utime
 
 CRITICAL = 50
-ERROR    = 40
-WARNING  = 30
-INFO     = 20
-DEBUG    = 10
-NOTSET   = 0
+ERROR = 40
+WARNING = 30
+INFO = 20
+DEBUG = 10
+NOTSET = 0
 
 _level_dict = {
     CRITICAL: "CRITICAL",
@@ -19,7 +21,6 @@ _level_dict = {
 
 
 class Logger:
-
     level = NOTSET
 
     def __init__(self, name):
@@ -69,6 +70,8 @@ class Logger:
         self.log(ERROR, msg + "\n" + buf.getvalue(), *args)
 
     def exception(self, msg, *args):
+        if getattr(sys, "exc_info", None) is None:
+            self.log(ERROR, msg + "\nMPY: no sys.exc_info", *args)
         self.exc(sys.exc_info()[1], msg, *args)
 
     def addHandler(self, hdlr):
@@ -96,11 +99,38 @@ def getLogger(name=None):
     _loggers[name] = l
     return l
 
-def info(msg, *args):
-    getLogger(None).info(msg, *args)
+
+def log(level, msg, *args):
+    getLogger(None).log(level, msg, *args)
+
 
 def debug(msg, *args):
     getLogger(None).debug(msg, *args)
+
+
+def info(msg, *args):
+    getLogger(None).info(msg, *args)
+
+
+def warning(msg, *args):
+    getLogger(None).warning(msg, *args)
+
+
+def error(msg, *args):
+    getLogger(None).error(msg, *args)
+
+
+def critical(msg, *args):
+    getLogger(None).critical(msg, *args)
+
+
+def exc(e, msg, *args):
+    getLogger(None).exc(e, msg, *args)
+
+
+def exception(msg, *args):
+    getLogger(None).exception(msg, *args)
+
 
 def basicConfig(level=INFO, filename=None, stream=None, format=None, style="%"):
     global _level
@@ -161,7 +191,6 @@ class FileHandler(Handler):
 
 
 class Formatter:
-
     converter = utime.localtime
 
     def __init__(self, fmt=None, datefmt=None, style="%"):
@@ -209,7 +238,7 @@ class Formatter:
     def formatTime(self, record, datefmt=None):
         assert datefmt is None  # datefmt is not supported
         ct = utime.localtime(record.created)
-        return "{0}-{1}-{2} {3}:{4}:{5}".format(*ct)
+        return "{0:02}-{1:02}-{2:02} {3:02}:{4:02}:{5:02}".format(*ct)
 
     def formatException(self, exc_info):
         raise NotImplementedError()

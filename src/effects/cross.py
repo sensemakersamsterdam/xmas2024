@@ -1,8 +1,11 @@
 """
-red_cross.py - Display a red cross on the matrix
+cross.py - Display a red cross on the matrix
+Author: Karijn Wessing, Sensemakers Amsterdam
+Maintainer: Sensemakers Amsterdam  https://sensemakersams.org
 """
 
-from . import EffectBase
+from . import EffectBase, text2color
+import senselogging as logging
 
 
 class Cross(EffectBase):
@@ -31,7 +34,7 @@ class Cross(EffectBase):
         super().__init__(matrix, params)
         self._is_on = True
         self._wait = params.get("wait", 500)
-        self._color = eval(params.get("color", "(255, 0, 0)"))
+        self._color = text2color(params)
 
     def render(self):
         """

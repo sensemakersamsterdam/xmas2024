@@ -1,11 +1,16 @@
 """
-red_cross.py - Display a red cross on the matrix
+sensor.py - Adaptive cross effect.
+Author: Karijn Wessing, Sensemakers Amsterdam
+Maintainer: Sensemakers Amsterdam  https://sensemakersams.org
 """
 
-from . import EffectBase
+import machine
 import veml7700
 
-i2c=machine.I2C(1, scl=machine.Pin(6), sda=machine.Pin(5), freq=10000)
+from . import EffectBase, text2color
+
+i2c = machine.I2C(1, scl=machine.Pin(6), sda=machine.Pin(5), freq=10000)
+
 
 class Sensor(EffectBase):
     """
@@ -18,6 +23,7 @@ class Sensor(EffectBase):
         wait (int): Wait time in milliseconds between toggles.
         color (tuple): Color of the cross.
     """
+
     help_purpose = "Display a red cross on the matrix."
     help_json = '{ "effect": "cross", "color": "(200,0,0)", "wait": 500 }'
 
@@ -32,10 +38,10 @@ class Sensor(EffectBase):
         super().__init__(matrix, params)
         self._is_on = True
         self._wait = params.get("wait", 500)
-        self.veml  = veml7700.VEML7700(address=0x10, i2c=i2c, it=100, gain=1/8)
-        #self._color = eval(params.get("color", "(255, 0, 0)"))
+        self.veml = veml7700.VEML7700(address=0x10, i2c=i2c, it=100, gain=1 / 8)
+        # self._color = text2color(params)
         self._color = (0, 0, 0)
-        
+
     def render(self):
         """
         Render the cross effect on the matrix.
@@ -60,7 +66,6 @@ class Sensor(EffectBase):
         if lux < 1:
             lux = 1
         self._color = (lux, int(lux / 2), int(lux / 4))
-        
-        
-register = (Cross,)
 
+
+register = (Sensor,)

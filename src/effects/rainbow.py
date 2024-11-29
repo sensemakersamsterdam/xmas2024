@@ -1,5 +1,7 @@
 """
-rainbow.py - Display a rainbow on the matrix
+rainbow.py - Display a rainbow on the matrix,
+Author: Karijn Wessing, Sensemakers Amsterdam
+Maintainer: Sensemakers Amsterdam  https://sensemakersams.org
 """
 
 from . import EffectBase, RAINBOW

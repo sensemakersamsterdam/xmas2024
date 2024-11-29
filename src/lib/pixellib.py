@@ -1,5 +1,22 @@
 """
-pixellib.py
+Description: This module provides a class to handle a NeoPixel matrix.
+
+Author: Gijs Mos, Sensemakers Amsterdam
+Maintainer: Sensemakers Amsterdam  https://sensemakersams.org
+
+Classes:
+- NeoPixMatrix: A class to handle a NeoPixel matrix with various utility methods.
+
+Methods:
+- __init__(self, neo_pixels, n_cols, n_rows, n_start=0): Initialize the NeoPixMatrix.
+- _row_col_to_n(self, row, col): Convert row and column to a single index.
+- set_pix(self, row, col, color=(0, 0, 0), show=False): Set the color of a specific pixel.
+- set_index(self, index, color=(0, 0, 0), show=False): Set the color of a specific pixel by index.
+- set_row(self, row, color=(0, 0, 0), show=False): Set the color of an entire row.
+- set_col(self, col, color=(0, 0, 0), show=False): Set the color of an entire column.
+- clear(self, show=True): Clear the entire matrix by setting all pixels to the clear color.
+- write(self): Update the display.
+- size(self): Return the total number of pixels in the matrix.
 """
 
 import neopixel

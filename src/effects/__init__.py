@@ -1,14 +1,33 @@
 """
-effect_base.py:
-    - Functions to initialize and run effects on the matrix.
-    - Base class for all effects.
-    - Utility functions and constants.
+Description: This module provides functions and a class to initialize and run effects on the matrix.
+It includes a base class for all effects, utility functions and constants, and an asynchronous mode.
+
+Author: Karijn Wessing and Gijs Mos, Sensemakers Amsterdam
+Maintainer: Sensemakers Amsterdam  https://sensemakersams.org
+
+Functions:
+- init_effects(matrix, use_async=False): Initialize the effects module with the given matrix object.
+- get_effects(): Return a tuple of all registered effect objects, sorted by effect name.
+- get_effect_name(effect): Return the name of the effect passed in.
+- all_effect_names(): Return a tuple of the names of all registered effects sorted.
+- get_effect_purpose(effect): Return the purpose of the effect as a string.
+- get_effect_json(effect): Return the JSON string to use to start the effect.
+- effect_by_name(effect_name): Return the effect object by name or None if not found.
+- effect_loop(): Execute the loop method of the current effect if it exists.
+- start_effect(effect, params=None): Start an effect with optional effect-specific parameters.
+- start_effect_by_name(effect_name, params=None): Start an effect by name with optional effect-specific parameters.
+- start_effect_from_json(json_str): Start an effect from a JSON string.
+- mqtt_effect_handler(topic, msg): Handler for the /effect MQTT sub topic.
+- wheel(pos): Input a value 0 to 255 to get a color value.
+- random_color(color_list=RAINBOW): Return a random color from the list passed in.
+- full_help(): Return a string with the help for all effects.
 """
 
 import json
 from os import listdir
 from random import choice
 from time import ticks_ms
+import senselogging as logging
 
 _ASYNC = False  # Use asyncio for effect loop if True
 _matrix = None  # holds the matrix object to render the effects on
@@ -39,7 +58,7 @@ def init_effects(matrix, use_async=False):
     for f in listdir(pack_dir):
         if f.endswith(".py") and f != "__init__.py":
             name = "effects." + f[:-3]
-            print(f"Importing {name}")
+            logging.debug("Importing %s", name)
             exec(f"import {name}")
             m = eval(name)
             if hasattr(m, "register"):
@@ -73,7 +92,8 @@ def get_effect_name(effect):
     Returns:
         str: The name of the effect in lowercase.
     """
-    assert issubclass(effect, EffectBase), f"Not an effect {effect}"
+    if not issubclass(effect, EffectBase):
+        raise TypeError(f"Not an effect {effect}")
     return effect.__name__.lower()
 
 
@@ -201,6 +221,8 @@ def start_effect_by_name(effect_name, params=None):
     effect = effect_by_name(effect_name)
     if effect is not None:
         return start_effect(effect, params)
+    else:
+        logging.warning("Effect not defined: %s", effect_name)
     return None
 
 
@@ -215,14 +237,23 @@ def start_effect_from_json(json_str):
         The result of the effect's start() method, or None if not found.
     """
     try:
-        params = json.loads(json_str)
-        effect_name = params.get("effect")
+        effect_params = json.loads(json_str)
+        effect_name = effect_params.get("effect")
         if effect_name is not None:
-            return start_effect_by_name(effect_name, params)
+            return start_effect_by_name(effect_name, effect_params)
+        logging.warning('No "effect" in JSON: %s', json_str)
     except Exception as e:
-        message = f"Could not start: {json_str}, {e}"
-        print(message)
+        logging.exc(e, "Could not start: %s", json_str)
+
     return None
+
+
+def mqtt_effect_handler(topic, msg):
+    """Handler for the /effect MQTT sub topic."""
+    msg = msg.decode().strip()
+    logging.info("From MQTT: %s - %s", topic, msg)
+    if topic == "effect":
+        start_effect_from_json(msg)
 
 
 ###
@@ -263,7 +294,7 @@ class EffectBase:
             self.render()
             return True
         except Exception as e:
-            print(f"Could not start {self.__class__.__name__} due to {e}")
+            logging.exc(e, "Could not start %s.", self.__class__.__name__)
             return False
 
     def render(self):
@@ -384,3 +415,24 @@ def full_help():
         help_lines.append(f"{name}: {get_effect_purpose(e)}")
         help_lines.append(f"{'':{len(name)+1}} {get_effect_json(e)}")
     return "\n".join(help_lines)
+
+
+def text2color(params, default_color_rgb=(255, 0, 0)):
+    """
+    Get the color string from the params dict and convert it to a color setting.
+
+    Args:
+        params (dict): The parameters to get the color from.
+
+    Returns:
+        tuple: The color as a tuple (r, g, b).
+    """
+    try:
+        color = params.get("color", f"{default_color_rgb}")
+        color_rgb = eval(color)
+        if not isinstance(color_rgb, tuple) or len(color_rgb) != 3:
+            raise TypeError(f'"color" must be a stringified tuple of three integers, not "{color_rgb}".')
+    except TypeError as e:
+        logging.exc(e, "Cannot convert color setting, setting to {default_color_rgb}}")
+        color_rgb = default_color_rgb
+    return color_rgb

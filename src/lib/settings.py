@@ -1,12 +1,26 @@
-# Module to read a simple settings file
+"""
+Description: This module provides functions to load settings from a file,
+store them in a global dictionary, and retrieve them as needed.
 
-DEFAULT_FILE = "dot.env"
+Author: Gijs Mos, Sensemakers Amsterdam
+Maintainer: Sensemakers Amsterdam  https://sensemakersams.org
+
+Functions:
+- settings_load(file_path=DEFAULT_FILE_PATH): Load settings from a file and store them in a global dictionary.
+- settings_get_dict(file_path=DEFAULT_FILE_PATH): Reads a settings file and returns a dictionary of settings.
+- settings_get_many(*args, file_path=DEFAULT_FILE_PATH): Retrieves specific settings from the settings file.
+- settings_get(key, default=None, file_path=DEFAULT_FILE_PATH): Retrieves a specific setting from the settings file.
+"""
+
+import senselogging as logging
+
+DEFAULT_FILE_PATH = "dot.env"
 
 _settings = {}
 _loaded = False
 
 
-def load_settings(file_path=DEFAULT_FILE):
+def settings_load(file_path=DEFAULT_FILE_PATH):
     """
     Load settings from a file and store them in a global dictionary.
 
@@ -25,21 +39,27 @@ def load_settings(file_path=DEFAULT_FILE):
     if _loaded:
         return
 
-    print(f"Loading settings from {file_path}")
+    logging.info(f"Loading settings from {file_path}.")
     try:
         with open(file_path) as f:
             for line in f:
                 line = line.strip()
                 # Ignore empty lines and comments
                 if line and not line.startswith("#"):
-                    key, value = line.split("=")
+                    try:
+                        key, value = line.split("=", 1)
+                    except ValueError:
+                        logging.warning("Skipping invalid settings line: %s,", line)
+                        continue
+                    value = value.partition("#")[0]
                     _settings[key.strip().lower()] = value.strip()
         _loaded = True
     except Exception as e:
-        print(f"Error reading settings file: {e}")
+        logging.exc(e, "Error reading settings file.")
+        raise
 
 
-def get_settings_dict(file_path=DEFAULT_FILE):
+def settings_get_dict(file_path=DEFAULT_FILE_PATH):
     """
     Reads a settings file and returns a dictionary of settings.
 
@@ -49,11 +69,11 @@ def get_settings_dict(file_path=DEFAULT_FILE):
     Returns:
         dict: A dictionary containing the settings.
     """
-    load_settings(file_path)
+    settings_load(file_path)
     return _settings
 
 
-def get_settings(*args, file_path=DEFAULT_FILE):
+def settings_get_many(*args, file_path=DEFAULT_FILE_PATH):
     """
     Retrieves specific settings from the settings file.
 
@@ -62,13 +82,13 @@ def get_settings(*args, file_path=DEFAULT_FILE):
         file_path (str): Path to the settings file. Defaults to ".env".
 
     Returns:
-        tuple: A generator returning the values of the requested settings in order.
+        list: A list containing the values of the requested settings in order.
     """
-    load_settings(file_path)
-    return (_settings.get(k.lower(), None) for k in args)
+    settings_load(file_path)
+    return [_settings.get(k.lower(), None) for k in args]
 
 
-def get_setting(key, default=None):
+def settings_get(key, default=None, file_path=DEFAULT_FILE_PATH):
     """
     Retrieves a specific setting from the settings file.
 
@@ -79,6 +99,5 @@ def get_setting(key, default=None):
     Returns:
         str: The value of the setting if found, or the default value.
     """
-    if not _loaded:
-        raise RuntimeError("Settings not loaded. Call load_settings() first.")
-    return _settings.get(key.lower(), default)
+    settings_load(file_path)
+    return _settings.get(key.lower().strip(), default)

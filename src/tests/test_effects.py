@@ -1,6 +1,14 @@
 import time
-from effects import all_effect_names, effect_loop, random_color, start_effect, effect_by_name
-from app import startup
+import senselogging as logging
+from effects import (
+    all_effect_names,
+    effect_loop,
+    random_color,
+    start_effect,
+    effect_by_name,
+)
+from main import startup
+
 
 def test_effects():
     """
@@ -17,8 +25,9 @@ def test_effects():
             curr_effect = effect_names[0]
             effect_names = effect_names[1:] + [curr_effect]
             start_effect(effect_by_name(curr_effect), {"color": f"{random_color()}"})
-            print(f"Starting effect: {curr_effect}")
+            logging.info("Starting effect: &s", curr_effect)
             start_time = time.time()
         effect_loop()
+
 
 test_effects()

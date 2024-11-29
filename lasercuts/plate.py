@@ -1,10 +1,20 @@
 import svgwrite
 
 # Create a new SVG drawing
-dwg = svgwrite.Drawing('plate.svg', profile='tiny', size=("12cm", "4cm"), viewBox="0 0 1200 400")
+dwg = svgwrite.Drawing(
+    "plate.svg", profile="tiny", size=("12cm", "4cm"), viewBox="0 0 1200 400"
+)
 
 # Show outline of viewport using 'rect' element
-dwg.add(dwg.rect(insert=(1, 1), size=("410mm", "210mm"), fill="none", stroke="blue", stroke_width=2))
+dwg.add(
+    dwg.rect(
+        insert=(1, 1),
+        size=("410mm", "210mm"),
+        fill="none",
+        stroke="blue",
+        stroke_width=2,
+    )
+)
 
 # Create a group of lines with green stroke
 g = dwg.g(stroke="orange")

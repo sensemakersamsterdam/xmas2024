@@ -1,5 +1,6 @@
+# Modified version of logging module from MicroPython.  Gijs Mos,  Sensemakers Amsterdam
 import os
-import sys
+
 from . import Handler
 
 
