@@ -439,6 +439,18 @@ def text2color(params, default_color_rgb=(255, 0, 0)):
 
 
 def fader(fade_index: int, fade_max : int, fade_from, fade_to):
+    """
+    Fade from one color/set to an orher.
+
+    Args:
+        fade_index (int): The current fade step.
+        fade_max (int):   The number of fade steps.
+        fade_from (int/tuple/list-of-tuples): The first fade step.
+        fade_to (int/tuple/list-of-tuples): The last fade step.
+
+    Returns:
+        tuple: The color as a tuple (r, g, b).
+    """
     if isinstance(fade_from, tuple) and isinstance(fade_to, tuple):
         #print(f"fade tuples {fade_index}, {fade_max}, {fade_from}, {fade_to}")
         return tuple([fader(fade_index, fade_max, fade_from[i], fade_to[i]) for i in range(min(len(fade_from), len(fade_to)))])
