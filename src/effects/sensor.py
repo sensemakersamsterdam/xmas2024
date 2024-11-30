@@ -9,7 +9,7 @@ import veml7700
 
 from . import EffectBase, text2color
 
-i2c = machine.I2C(1, scl=machine.Pin(6), sda=machine.Pin(5), freq=10000)
+i2c = machine.I2C(1, scl=machine.Pin(1), sda=machine.Pin(0), freq=10000)
 
 
 class Sensor(EffectBase):
