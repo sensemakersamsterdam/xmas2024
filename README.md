@@ -11,4 +11,4 @@ Subdirectories:
 - *elec* for the schematics and PCB design in KiCad, PDF and JLCPCB manifacture formats,
 - *case* for the design of the case and acrylic parts of the case.
 
-TBA - pictures and more description.
+For more info consult [https://sensemakersams.org/xmas-2024-acrylic-lamp/](https://sensemakersams.org/xmas-2024-acrylic-lamp/)
