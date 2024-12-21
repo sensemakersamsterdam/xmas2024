@@ -21,7 +21,8 @@ Methods:
 
 import neopixel
 from gfx import GFX
-
+from time import sleep_ms
+from machine import Pin
 
 class NeoPixMatrix(GFX):
     BLUE = (0, 0, 255)
@@ -84,7 +85,7 @@ class NeoPixMatrix(GFX):
         # print(f" set ({col}, {row}) to {color}")
         self.pix[self._row_col_to_n(row, col)] = color
         if show:
-            self.pix.write()
+            self.write()
 
     def set_index(self, index, color=(0, 0, 0), show=False):
         """Set the color of a specific pixel.
@@ -99,7 +100,7 @@ class NeoPixMatrix(GFX):
         """
         self.pix[index + self.n_start] = color
         if show:
-            self.pix.write()
+            self.write()
 
     def set_row(self, row, color=(0, 0, 0), show=False):
         """Set the color of an entire row.
@@ -115,7 +116,7 @@ class NeoPixMatrix(GFX):
         for c in range(self.n_cols):
             self.set_pix(row, c, color)
         if show:
-            self.pix.write()
+            self.write()
 
     def set_col(self, col, color=(0, 0, 0), show=False):
         """Set the color of an entire column.
@@ -131,7 +132,7 @@ class NeoPixMatrix(GFX):
         for r in range(self.n_rows):
             self.set_pix(r, col, color)
         if show:
-            self.pix.write()
+            self.write()
 
     def clear(self, show=True):
         """Clear the entire matrix by setting all pixels to the clear color.
@@ -148,9 +149,11 @@ class NeoPixMatrix(GFX):
             for i in range(self.size()):
                 self.set_index(i, self.CLEAR)
         if show:
-            self.pix.write()
+            self.write()
 
     def write(self):
+        self.pix.pin.off()
+        sleep_ms(1)
         self.pix.write()
 
     def size(self):
