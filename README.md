@@ -12,3 +12,8 @@ Subdirectories:
 - *case* for the design of the case and acrylic parts of the case.
 
 For more info consult [https://sensemakersams.org/xmas-2024-acrylic-lamp/](https://sensemakersams.org/xmas-2024-acrylic-lamp/)
+
+![](images/Image1.jpg)
+![](images/Image2.jpg)
+![](images/Image3.jpg)
+
