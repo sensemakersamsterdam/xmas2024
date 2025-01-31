@@ -25,7 +25,7 @@ class Sensor(EffectBase):
     """
 
     help_purpose = "Display a red cross on the matrix."
-    help_json = '{ "effect": "cross", "color": "(200,0,0)", "wait": 500 }'
+    help_json = '{ "effect": "sensor", "color": "(200,0,0)", "wait": 500 }'
 
     def __init__(self, matrix, params):
         """
