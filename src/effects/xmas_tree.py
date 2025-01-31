@@ -19,7 +19,7 @@ class XmasTree(EffectBase):
     """
 
     help_purpose = "Display the Tree, it's outline, and ornament on the matrix."
-    help_json = '{ "effect": "cross", "color": "(200,0,0)", "wait": 500 }'
+    help_json = '{ "effect": "xmastree", "color": "(200,0,0)", "wait": 500 }'
 
     def __init__(self, matrix, params):
         """

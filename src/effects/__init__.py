@@ -440,7 +440,7 @@ def text2color(params, default_color_rgb=(255, 0, 0)):
 
 def fader(fade_index: int, fade_max : int, fade_from, fade_to):
     """
-    Fade from one color/set to an orher.
+    Fade from one color/set to an other.
 
     Args:
         fade_index (int): The current fade step.
